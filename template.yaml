@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+# Parameters:
+#   # AppName:
+#   #   Type: String
+#   #   Description: "Name of application."
+#   #   AllowedPattern: ".+"
+#   #   Default: "sam-assignment"
+
+#   # Environment:
+#   #   Type: String
+#   #   Description: "Environment code of deployment (dev, uat, prod)"
+#   #   AllowedPattern: ".+"
+#   #   AllowedValues:
+#   #     - "dev"
+#   #     - "uat"
+#   #     - "prod"
+
+Description: >
+  sam-assignment
+
+  Sample SAM Template for sam-assignment
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    # You can add LoggingConfig parameters such as the LogFormat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  SamBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: samassignmentbucket
+  SamAssignApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      MethodSettings:
+        - HttpMethod: POST
+          ResourcePath: /api/
+          ThrottlingRateLimit: 40
+          ThrottlingBurstLimit: 50
+      Auth:
+        DefaultAuthorizer: SAMLambdaAuthorizer
+        Authorizers:
+          SAMLambdaAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt SamAuthorizer.Arn
+            AuthorizerResultTtlInSeconds: 250
+            Identity:
+              Headers:
+                - Authorization
+  SamAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: authoriser.handler
+      Runtime: nodejs20.x
+      CodeUri: dist/
+      # Events:
+      #   MyAuthorizer:
+      #     Type: Api
+      #     Properties:
+      #       Path: /auth
+      #       Method: POST
+      #       RestApiId:
+      #         Ref: SamAssignApi
+  UploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: upload.handler
+      Runtime: nodejs20.x
+      CodeUri: dist/
+      Events:
+        UploadApi:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: POST
+            RestApiId:
+              Ref: SamAssignApi
+      Policies:
+      - S3CrudPolicy:
+          BucketName: !Ref SamBucket
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  SamAssignApi:
+    Description: API Gateway endpoint URL for dev stage for Upload function
+    Value: !Sub "https://${SamAssignApi}.execute-api.${AWS::Region}.amazonaws.com/dev/upload/"
+  # UploadFunction:
+  #   Description: Hello World Lambda Function ARN
+  #   Value: !GetAtt UploadFunction.Arn
+  # HelloWorldFunctionIamRole:
+  #   Description: Implicit IAM Role created for Hello World function
+  #   Value: !GetAtt HelloWorldFunctionRole.Arn
