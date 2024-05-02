@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-      "target": "es2020",
+      "target": "ESNext",
       "lib": [
-        "es2020"
+        "ESNext"
       ],
       "strict": true,
       "resolveJsonModule": true,
