@@ -7,13 +7,14 @@
   "license": "MIT",
   "scripts": {
     "unit": "jest",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && sam build && sam deploy --template-file template.yaml --config-file samconfig.toml --capabilities CAPABILITY_IAM --no-confirm-changeset --debug",
     "lint": "eslint '*.ts' --quiet --fix",
     "compile": "tsc",
     "test": "npm run compile && npm run unit"
   },
   "dependencies": {
-    "aws-sdk": "^2.1610.0",
+    "@aws-sdk/client-s3": "^3.567.0",
+    "@aws-sdk/s3-request-presigner": "^3.567.0",
     "esbuild": "^0.14.14"
   },
   "devDependencies": {
