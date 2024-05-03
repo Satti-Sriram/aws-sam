@@ -37,6 +37,15 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: samassignmentbucket
+      # NotificationConfiguration:
+      #   QueueConfigurations:
+      #     - QueueArn: !GetAtt SamAssignSQSQueue.Arn
+      #       Events:
+      #         - s3:ObjectCreated:*
+  SamAssignSQSQueue:
+    Type: AWS::SQS::Queue
+  SamAssignSNSTopic:
+    Type: AWS::SNS::Topic
   SamAssignApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -87,6 +96,21 @@ Resources:
       Policies:
       - S3CrudPolicy:
           BucketName: !Ref SamBucket
+  # SqsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: lambda.handler
+  #     Runtime: nodejs20.x
+  #     CodeUri: ./
+  #     Environment:
+  #       Variables:
+  #         SNS_TOPIC_ARN: !Ref SamAssignSNSTopic
+  #     Events:
+  #       SQSEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt SamAssignSQSQueue.Arn
+
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM

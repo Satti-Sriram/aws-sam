@@ -14,15 +14,14 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.567.0",
+    "@aws-sdk/client-sns": "^3.568.0",
     "@aws-sdk/s3-request-presigner": "^3.567.0",
-    "esbuild": "^0.14.14",
-    "parse-multipart": "^1.0.4"
+    "esbuild": "^0.14.14"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.92",
     "@types/jest": "^29.2.0",
     "@types/node": "^20.5.7",
-    "@types/parse-multipart": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "eslint": "^8.8.0",
